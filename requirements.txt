@@ -1,0 +1,7 @@
+rdkit==2026.9.1
+fastapi==0.162.0
+uvicorn==0.54.0
+tblite==0.8.0
+ase==3.29.0
+numpy>=2.0
+scipy>=1.14

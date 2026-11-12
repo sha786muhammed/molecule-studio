@@ -1,0 +1,11 @@
+node_modules/
+.runtime/
+dist/
+backend/data/
+__pycache__/
+.venv/
+*.log
+examples/results/
+.DS_Store
+*.zip
+.env

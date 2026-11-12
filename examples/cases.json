@@ -1,0 +1,5 @@
+[
+  {"id":"water-xtb","name":"Water example","smiles":"O","method":"GFN2-xTB","task":"optimize","frequencies":true},
+  {"id":"ethanol-mmff","name":"Ethanol example","smiles":"CCO","method":"MMFF94","task":"optimize","frequencies":false},
+  {"id":"butane-conformers","name":"Butane example","smiles":"CCCC","method":"MMFF94","task":"conformers","conformer_count":30,"rmsd_threshold":0.5,"frequencies":false}
+]

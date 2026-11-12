@@ -1,0 +1,14 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {ArrowClockwise,MagnifyingGlassPlus,MagnifyingGlassMinus,CornersOut,ArrowsClockwise} from '@phosphor-icons/react';
+import {CanvasEditor,Molecule} from 'openchemlib';
+import {createSoftwareViewer} from './softwareViewer';
+export function DrawingEditor({smiles,editorRef}){
+ const host=useRef();useEffect(()=>{const e=new CanvasEditor(host.current);editorRef.current=e;if(smiles)e.setMolecule(Molecule.fromSmiles(smiles));return()=>{e.destroy();editorRef.current=null;};},[smiles]);
+ return <div className="drawing-canvas" ref={host} aria-label="Interactive 2D molecule editor"/>;
+}
+export function MoleculeView({molecule,charges,height=390,compact=false}){
+ const host=useRef(),viewer=useRef();const [spin,setSpin]=useState(false);
+ useEffect(()=>{if(!host.current)return;const element=host.current;element.replaceChildren();const test=document.createElement('canvas');const supported=Boolean(test.getContext('webgl'));const v=supported&&window.$3Dmol?window.$3Dmol.createViewer(element,{backgroundColor:'white',antialias:true}):createSoftwareViewer(element);viewer.current=v;const resize=new ResizeObserver(()=>{v.resize();v.render();});resize.observe(element);return()=>{resize.disconnect();v.spin(false);v.clear();viewer.current=null;element.replaceChildren();};},[]);
+ useEffect(()=>{const v=viewer.current;if(!v||!molecule?.molblock)return;v.clear();v.addModel(molecule.molblock,'sdf');v.setStyle({},{stick:{radius:0.12,colorscheme:'Jmol'},sphere:{scale:0.27,colorscheme:'Jmol'}});if(charges){v.getModel().selectedAtoms({}).forEach((a,i)=>{a.properties={charge:charges[i]};});v.setStyle({},{stick:{radius:0.12},sphere:{scale:0.28,colorfunc:a=>a.properties.charge<0?'#d35454':'#4a6ec3'}});}v.zoomTo();v.render();},[molecule?.molblock,charges]);
+ return <div className={'molecular-view '+(compact?'compact':'')} style={{height}}><div className="render-host" ref={host}/>{!compact&&<><div className="viewer-toolbar"><button className="icon-button" title="Reset view" onClick={()=>{viewer.current.zoomTo();viewer.current.render();}}><ArrowClockwise/></button><button className="icon-button" title="Zoom in" onClick={()=>{viewer.current.zoom(1.2);viewer.current.render();}}><MagnifyingGlassPlus/></button><button className="icon-button" title="Zoom out" onClick={()=>{viewer.current.zoom(.8);viewer.current.render();}}><MagnifyingGlassMinus/></button><button className={'icon-button '+(spin?'active':'')} title="Rotate molecule" onClick={()=>{viewer.current.spin(!spin);setSpin(!spin);}}><ArrowsClockwise/></button><button className="icon-button" title="Fullscreen molecule" onClick={()=>host.current.parentElement.requestFullscreen?.()}><CornersOut/></button></div><div className="viewer-caption">Drag to rotate · scroll to zoom <span>Coordinates in Å</span></div></>}</div>;
+}

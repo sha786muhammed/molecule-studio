@@ -1,0 +1,55 @@
+{
+  "recorded_utc": "2026-11-11T16:42:15.175759+00:00",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "engines": {
+    "RDKit": "2026.09.1",
+    "tblite": "0.8.0",
+    "ASE": "3.29.0"
+  },
+  "examples": [
+    {
+      "case": "water-xtb",
+      "method": "GFN2-xTB",
+      "energy": -5.070544444989837,
+      "energy_unit": "Hartree",
+      "converged": true,
+      "dipole_debye": 2.217123549896507,
+      "internal_frequencies_cm-1": [
+        1538.7104327880122,
+        3643.309161027265,
+        3651.734654069483
+      ],
+      "conformer_relative_energies_kcal_mol": [],
+      "engine": "tblite 0.8.0 / ASE 3.29.0",
+      "checks": "passed"
+    },
+    {
+      "case": "ethanol-mmff",
+      "method": "MMFF94",
+      "energy": -1.336857061938527,
+      "energy_unit": "kcal/mol",
+      "converged": true,
+      "dipole_debye": null,
+      "internal_frequencies_cm-1": [],
+      "conformer_relative_energies_kcal_mol": [],
+      "engine": "RDKit 2026.09.1",
+      "checks": "passed"
+    },
+    {
+      "case": "butane-conformers",
+      "method": "MMFF94",
+      "energy": -5.075973341359022,
+      "energy_unit": "kcal/mol",
+      "converged": true,
+      "dipole_debye": null,
+      "internal_frequencies_cm-1": [],
+      "conformer_relative_energies_kcal_mol": [
+        0.0,
+        0.7822090673342768
+      ],
+      "engine": "RDKit 2026.09.1",
+      "checks": "passed"
+    }
+  ],
+  "interpretation": "Method-specific computational examples; not experimental validation or a guarantee for other molecules."
+}
