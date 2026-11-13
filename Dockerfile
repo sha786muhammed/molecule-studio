@@ -12,13 +12,14 @@ ENV PYTHONUNBUFFERED=1 \
     OPENBLAS_NUM_THREADS=1 \
     STUDIO_DEMO=1 \
     STUDIO_DATA_DIR=/tmp/molecule-studio
-RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libstdc++6 libxrender1 libxext6 libx11-6 \
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libstdc++6 libxrender1 libxext6 libx11-6 libexpat1 \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 10001 studio
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=studio:studio backend ./backend
+RUN python -c "from backend.chemistry import prepare_molecule; from tblite.interface import Calculator; assert prepare_molecule('O')['formula'] == 'H2O'"
 COPY --from=frontend --chown=studio:studio /build/dist/client ./dist/client
 USER studio
 EXPOSE 10000
