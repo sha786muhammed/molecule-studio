@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     OPENBLAS_NUM_THREADS=1 \
     STUDIO_DEMO=1 \
     STUDIO_DATA_DIR=/tmp/molecule-studio
-RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libstdc++6 \
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libstdc++6 libxrender1 libxext6 libx11-6 \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 10001 studio
 WORKDIR /app

@@ -34,7 +34,7 @@ def check(base_url):
         try:
             health = alice.request('/api/health')
             break
-        except (urllib.error.URLError, TimeoutError):
+        except OSError:
             if time.monotonic() > deadline:
                 raise
             time.sleep(.5)
