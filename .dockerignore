@@ -1,0 +1,14 @@
+.git
+.venv
+.runtime
+node_modules
+dist
+backend/data
+**/visitors
+**/__pycache__
+**/*.pyc
+**/*.sqlite3*
+**/.env*
+**/*.log
+**/*.zip
+examples/results

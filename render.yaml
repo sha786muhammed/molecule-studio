@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: molecule-studio
+    runtime: docker
+    plan: free
+    region: ohio
+    healthCheckPath: /api/health
+    envVars:
+      - key: STUDIO_DEMO
+        value: "1"
+      - key: STUDIO_DATA_DIR
+        value: /tmp/molecule-studio
+      - key: STUDIO_SESSION_SECRET
+        generateValue: true

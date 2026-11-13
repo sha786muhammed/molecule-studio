@@ -1,4 +1,16 @@
-# Local release verification — 11 November 2026
+# Verification records
+
+## Free-demo preparation — 13 November 2026
+
+- Production frontend build passed. The existing large-JavaScript-bundle warning remains.
+- 24 Python tests and 6 JavaScript tests passed. The four Sites packaging checks are included in the JavaScript suite.
+- Six hosted integration tests cover separate browser workspaces, access to local data, real background xTB and XYZ export, cross-visitor job/export denial, modified and expired cookies, cross-origin writes, per-workspace quotas, and the shared queue limit.
+- The hosted ASGI entry point was started through uvicorn and checked over HTTP: built frontend, real water GFN2-xTB single point, XYZ download and a second visitor's access denial all passed.
+- The unchanged local launch workflow and three scientific examples were checked again through `scripts/smoke_local.py`.
+- Docker is unavailable in the editing environment. The GitHub workflow now builds the actual container and runs `scripts/smoke_hosted.py` with a 512 MB memory cap and 0.1 CPU. Consult its run result before claiming the container build passed.
+- A public website is not deployed by committing deployment configuration. Render sign-in, a successful provider build and a live calculation are required.
+
+## Local release verification — 11 November 2026
 
 ## Environment
 
@@ -41,6 +53,6 @@ These are computational checks on specific molecules. They do not establish expe
 ## Remaining limits
 
 - A new visual browser check could not reach this workspace's preview through the available browser connections. No new browser-rendering claim is made for this packaging update; the frontend files are unchanged. The built HTML/API integration was checked directly through HTTP.
-- The GitHub workflow is included but has not executed remotely, and no GitHub repository or public website was published in this update.
-- The application remains a local single-user research prototype. It has no authentication, per-user private projects or shared hosted calculation service.
+- This historical local run preceded publication. The repository was published on 12 November; its initial GitHub validation [passed](https://github.com/sha786muhammed/molecule-studio/actions/runs/43278564097).
+- The local edition remains single-user. The later hosted demo adds temporary isolated browser workspaces, not authenticated accounts or durable hosted storage.
 - Upstream ASE/NumPy and FastAPI deprecation warnings remain; they did not prevent the recorded checks from passing.

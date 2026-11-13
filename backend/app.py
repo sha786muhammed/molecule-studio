@@ -1,6 +1,8 @@
 import os
 os.environ['OMP_NUM_THREADS']='1'
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
+from threading import BoundedSemaphore
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import Response
 import json, re
@@ -10,8 +12,12 @@ from backend import storage as store
 from backend.chemistry import prepare_molecule,run_calculation,validate_settings
 app=FastAPI(title='Molecule Studio API',version='0.1.0')
 pool=ThreadPoolExecutor(max_workers=1)
+demo_slots=BoundedSemaphore(3)
+def is_demo(): return os.environ.get('STUDIO_DEMO')=='1'
 @app.on_event('startup')
 def startup():
+    if not is_demo(): initialize_workspace()
+def initialize_workspace():
     store.init()
     for j in store.all_records('job'):
         if j['status'] in ('running','queued'): j.update(status='interrupted',error='The calculation service restarted. Submit again.'); store.save('job',j)
@@ -22,14 +28,17 @@ def startup():
 @app.get('/api/health')
 def health():
     import rdkit,importlib.metadata
-    return {'status':'ready','engines':{'RDKit':rdkit.__version__,'tblite':importlib.metadata.version('tblite'),'ASE':importlib.metadata.version('ase')},'scope':'Local single-user application','limits':{'atoms':80,'frequency_atoms':18}}
+    return {'status':'ready','engines':{'RDKit':rdkit.__version__,'tblite':importlib.metadata.version('tblite'),'ASE':importlib.metadata.version('ase')},'demo':is_demo(),'scope':'Temporary browser workspace' if is_demo() else 'Local single-user application','limits':{'atoms':40 if is_demo() else 80,'frequency_atoms':9 if is_demo() else 18,'conformers':30 if is_demo() else 100}}
 class ProjectInput(BaseModel):
     name:str=Field(min_length=1,max_length=120)
     description:str=Field(default='',max_length=1000)
 @app.get('/api/projects')
 def projects(): return store.all_records('project')
 @app.post('/api/projects')
-def add_project(body:ProjectInput): return store.save('project',body.model_dump())
+def add_project(body:ProjectInput):
+    with store.LOCK:
+        if is_demo() and len(store.all_records('project'))>=5: raise HTTPException(429,'Demo limit: five projects per browser workspace.')
+        return store.save('project',body.model_dump())
 class MoleculeInput(BaseModel):
     name:str=Field(default='Untitled molecule',max_length=120)
     content:str=Field(min_length=1,max_length=1_000_000)
@@ -42,8 +51,11 @@ def add_molecule(body:MoleculeInput):
     if not store.get(body.project_id): raise HTTPException(400,'Choose a valid project.')
     try: m=prepare_molecule(body.content,body.kind,body.name)
     except (ValueError,RuntimeError) as e: raise HTTPException(400,str(e))
+    if is_demo() and len(m['atoms'])>40: raise HTTPException(400,'Free demo: up to 40 atoms including hydrogen. Run locally for larger structures.')
     m['project_id']=body.project_id
-    return store.save('molecule',m)
+    with store.LOCK:
+        if is_demo() and len(store.all_records('molecule'))>=20: raise HTTPException(429,'Demo limit: 20 molecules per browser workspace. Download your work or run locally.')
+        return store.save('molecule',m)
 class JobInput(BaseModel):
     molecule_id:str
     name:str=Field(default='',max_length=120)
@@ -106,6 +118,21 @@ def add_job(body:JobInput):
     settings=body.model_dump(exclude={'name','molecule_id'})
     try: validate_settings(mol,settings)
     except ValueError as e: raise HTTPException(400,str(e))
-    if len([j for j in store.all_records('job') if j['status'] in ('queued','running')])>=5: raise HTTPException(429,'Five calculations are active. Wait for a job to finish.')
-    j=store.save('job',{'name':body.name or mol['name']+' · '+body.method+(' · conformers' if body.task=='conformers' else ''),'molecule':mol,'project_id':mol['project_id'],'settings':settings,'status':'queued','step':0})
-    pool.submit(execute,j['id']); return j
+    if is_demo():
+        if len(mol['atoms'])>40 or (body.frequencies and len(mol['atoms'])>9) or (body.task=='conformers' and body.conformer_count>30):
+            raise HTTPException(400,'Free demo: 40 atoms, 9 atoms for frequencies, and 30 conformer candidates. Run locally for larger calculations.')
+    with store.LOCK:
+        existing=store.all_records('job')
+        active=sum(j['status'] in ('queued','running') for j in existing)
+        if active>=(1 if is_demo() else 5): raise HTTPException(429,'Wait for your active calculation to finish.')
+        if is_demo() and len(existing)>=10: raise HTTPException(429,'Demo limit: ten calculations per browser workspace. Download your results or run locally.')
+        reserved=is_demo()
+        if reserved and not demo_slots.acquire(blocking=False): raise HTTPException(429,'The free demo is busy. Please try again after a calculation finishes.')
+        try:
+            j=store.save('job',{'name':body.name or mol['name']+' · '+body.method+(' · conformers' if body.task=='conformers' else ''),'molecule':mol,'project_id':mol['project_id'],'settings':settings,'status':'queued','step':0})
+            future=pool.submit(copy_context().run,execute,j['id'])
+        except BaseException:
+            if reserved: demo_slots.release()
+            raise
+        if reserved: future.add_done_callback(lambda _: demo_slots.release())
+        return j

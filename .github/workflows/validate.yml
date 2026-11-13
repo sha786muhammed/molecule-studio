@@ -29,3 +29,10 @@ jobs:
       - run: npm run test:sites
       - name: Verify the local launcher and scientific examples
         run: python scripts/smoke_local.py --output "$RUNNER_TEMP/studio-example-results"
+      - name: Build the free demo container
+        run: docker build -t molecule-studio:ci .
+      - name: Verify the hosted frontend and scientific backend within 512 MB
+        run: |
+          docker run -d --name studio-demo --memory=512m --cpus=0.1 -p 127.0.0.1:10000:10000 molecule-studio:ci
+          trap 'docker logs studio-demo; docker rm -f studio-demo' EXIT
+          python scripts/smoke_hosted.py
