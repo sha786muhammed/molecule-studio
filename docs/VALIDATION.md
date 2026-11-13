@@ -1,5 +1,19 @@
 # Verification records
 
+## Live free deployment — 13 November 2026
+
+[Open Molecule Studio](https://molecule-studio.onrender.com). Render deployed commit `8fe82e31d02d02ed2eecba9c8890d207d01ec47f` on a Docker **Free** instance, serving the React frontend and Python backend together.
+
+A calculation was submitted through the public website: water, GFN2-xTB, gas phase, charge 0, multiplicity 1, geometry optimization with numerical frequencies. It completed and reported convergence in 8.29 seconds. Electronic energy: −5.0705444 Hartree; dipole: 2.217 Debye; internal frequencies: 1538.71, 3643.31 and 3651.73 cm⁻¹. The XYZ download completed successfully. This is a specific computational smoke check, not a performance benchmark or experimental validation.
+
+The Home, Projects, Molecules, New calculation, Calculations, Results, Compare, Documentation and Settings pages were opened without application error alerts. This checks page access, not every possible interaction.
+
+![Live website showing the completed water optimization](images/live-demo.png)
+
+The source passed [GitHub validation](https://github.com/sha786muhammed/molecule-studio/actions/runs/43457930919): 24 Python tests, 6 JavaScript tests, the local scientific examples, container build, and hosted HTTP smoke check with 512 MB RAM and 0.1 CPU.
+
+Saved demo work remains temporary: export it before the free instance sleeps or restarts. Each visitor receives a separate browser workspace; this result is not a globally shared job.
+
 ## Free-demo preparation — 13 November 2026
 
 - Production frontend build passed. The existing large-JavaScript-bundle warning remains.

@@ -2,6 +2,8 @@
 
 ### Draw a molecule. Find its shapes. Explore what changes.
 
+**[Open the live demo →](https://molecule-studio.onrender.com)**
+
 An open-source molecular workbench that connects a 2D sketch to real calculations and interactive 3D results. No paid chemistry API or API key.
 
 ![Butane conformers ranked by calculated energy in Molecule Studio](docs/images/conformers.jpg)
@@ -13,7 +15,7 @@ An open-source molecular workbench that connects a 2D sketch to real calculation
 - **Compare** — inspect 3D conformers and rank calculated relative energies.
 - **Keep your work** — export XYZ, SDF, JSON and CSV.
 
-### Run it
+### Run locally
 
 With Python 3.12+ and Node.js 22+, from the project folder:
 
@@ -21,7 +23,7 @@ With Python 3.12+ and Node.js 22+, from the project folder:
 python3 launch.py
 ```
 
-### Host a free demo
+### Host your own free demo
 
 [Deploy frontend + backend on Render](https://render.com/deploy?repo=https://github.com/sha786muhammed/molecule-studio) · [Setup & free-plan limits](docs/DEPLOYMENT.md)
 

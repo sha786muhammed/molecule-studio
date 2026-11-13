@@ -1,5 +1,7 @@
 # A free website with a real calculation backend
 
+**[Open the hosted demo](https://molecule-studio.onrender.com)** — deployed and smoke-checked on 13 November 2026. Use the instructions below to host your own copy.
+
 The included Render Blueprint runs the React frontend and FastAPI/Python engine together at one HTTPS address. Calculations run on the server, so visitors can use a phone without installing Python.
 
 ## Deploy
