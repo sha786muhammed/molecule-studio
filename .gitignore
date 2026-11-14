@@ -9,3 +9,14 @@ examples/results/
 .DS_Store
 *.zip
 .env
+.env.*
+!.env.example
+.private/
+private/
+uploads/
+*.sqlite3
+*.sqlite3-*
+*.pem
+*.key
+*.p12
+*.pfx
